@@ -20,3 +20,9 @@ ble a b label -> jump to label if a <= b
 bge a b label -> jump to label if a >= b
 
 jmp label -> jump to label
+
+print x -> print x register or imm
+scan x -> scan into x register
+
+exit -> exits process
+
