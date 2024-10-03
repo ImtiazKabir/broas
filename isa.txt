@@ -1,0 +1,22 @@
+** every rvalue can be constants
+
+add a b c -> a = b + c
+
+same goes for sub
+
+lw x y -> load from y memory location to x register
+
+sw x y -> store x register's content to y memory location
+
+mult x y z -> x = y * z
+
+same goes for div
+
+beq a b label -> jump to label if a = b
+bneq a b label -> jump to label if a != b
+blt a b label -> jump to label if a < b
+bgt a b label -> jump to label if a > b
+ble a b label -> jump to label if a <= b
+bge a b label -> jump to label if a >= b
+
+jmp label -> jump to label
