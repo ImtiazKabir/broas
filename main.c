@@ -27,7 +27,7 @@ struct Variable {
 };
 
 int getValue(struct LexToken valueToken, struct Variable *variables, int numberOfVariables, struct Label *labels, int numberOfLabels);
-void setValue(struct LexToken variableToken, int value, struct Variable *variables, int *pNumberOfVariables);
+void setValue(struct LexToken *pVariableToken, int value, struct Variable *variables, int *pNumberOfVariables);
 
 int main(void) {
 	int fd;
@@ -120,7 +120,6 @@ int main(void) {
 			else if (strcmp(lexToken.token.tokstr, "not") == 0) {
 				instructions[nextInstruction][1] = tokens[i++];
 				instructions[nextInstruction][2] = tokens[i++];
-				instructions[nextInstruction][3] = tokens[i++];
 			}
 			else if (strcmp(lexToken.token.tokstr, "sl") == 0) {
 				instructions[nextInstruction][1] = tokens[i++];
@@ -196,7 +195,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand + rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sub") == 0) {
@@ -204,13 +203,13 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand - rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "lw") == 0) {
 			int memoryOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
 
-			setValue(instruction[1], memory[memoryOperand], variables, &nextVariable);
+			setValue(&instruction[1], memory[memoryOperand], variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sw") == 0) {
@@ -225,7 +224,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand * rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "div") == 0) {
@@ -233,7 +232,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand / rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "beq") == 0) {
@@ -263,7 +262,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand % rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "xor") == 0) {
@@ -271,7 +270,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand ^ rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "or") == 0) {
@@ -279,7 +278,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand | rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "and") == 0) {
@@ -287,14 +286,14 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand & rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "not") == 0) {
 			int operand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
 			int result = ~operand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sl") == 0) {
@@ -302,7 +301,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand << rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sr") == 0) {
@@ -310,7 +309,7 @@ int main(void) {
 			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			int result = leftOperand >> rightOperand;
 
-			setValue(instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "blt") == 0) {
@@ -373,7 +372,7 @@ int main(void) {
 		else if (strcmp(opcode, "scan") == 0) {
 			int c = getchar();
 
-			setValue(instruction[1], c, variables, &nextVariable);
+			setValue(&instruction[1], c, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "exit") == 0) {
@@ -412,12 +411,15 @@ int getValue(struct LexToken valueToken, struct Variable *variables, int numberO
 	}
 	else {
 		fprintf(stderr, "Cannot get value of %s, (can only access value of a variable or immediate or label)\n", valueToken.token.tokstr);
+		exit(1);
 	}
+	fprintf(stderr, "%s not defined\n", valueToken.token.tokstr);
 	exit(1);
 }
 
-void setValue(struct LexToken variableToken, int value, struct Variable *variables, int *pNumberOfVariables) {
+void setValue(struct LexToken *pVariableToken, int value, struct Variable *variables, int *pNumberOfVariables) {
 	int i;
+	struct LexToken variableToken = *pVariableToken;
 	
 	if (variableToken.type != VARIABLE) {
 		fprintf(stderr, "Can only set value of a variable\n");
@@ -431,7 +433,7 @@ void setValue(struct LexToken variableToken, int value, struct Variable *variabl
 		}
 	}
 
-	variables[*pNumberOfVariables].name = variableToken.token.tokstr;
+	variables[*pNumberOfVariables].name  = pVariableToken->token.tokstr;
 	variables[*pNumberOfVariables].value = value;
 	++(*pNumberOfVariables);
 }
