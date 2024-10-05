@@ -1,2 +1,2 @@
 all:
-	gcc -ansi -pedantic -Wall -Wextra *.c
+	gcc -DLEXER_MAIN -ansi -pedantic -Wall -Wextra *.c

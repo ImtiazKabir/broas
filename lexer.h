@@ -3,7 +3,7 @@
 
 #define MX_TOK_SZ 32
 
-enum TokenType { LABEL, OPCODE, REGISTER, IMMEDIATE };
+enum TokenType { LABEL, OPCODE, VARIABLE, IMMEDIATE };
 
 struct LexToken {
   enum TokenType type;
