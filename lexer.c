@@ -95,6 +95,8 @@ int getImmVal(char *word) {
     return '\t';
   case 'v':
     return '\v';
+  case 's':
+    return ' '; /* spaces messed up word tokenization, so .. */
   case '0':
     return '\0';
   }
