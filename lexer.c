@@ -50,10 +50,9 @@ char *getword(char *line, char *word, size_t max) {
 
 enum TokenType toktype(char const *word) {
   static char const opcodes[][8] = {
-      "add", "sub", "lw",  "sw",  "mult",  "div",  "beq", "bneq",
-      "mod", "xor", "or",  "and", "not",   "sl",   "sr",  "blt",
-      "bgt", "ble", "bge", "jmp", "ref", "deref",
-			"print", "scan", "exit"};
+      "add", "sub", "lw",  "sw",    "mult",  "div",  "beq", "bneq", "mod",
+      "xor", "or",  "and", "not",   "sl",    "sr",   "blt", "bgt",  "ble",
+      "bge", "jmp", "ref", "deref", "print", "scan", "exit"};
   static int const n = sizeof(opcodes) / sizeof(opcodes[0]);
   int i;
 
@@ -67,11 +66,39 @@ enum TokenType toktype(char const *word) {
     return LABEL;
   }
 
-  if (('0' <= *word && *word <= '9') || *word == '-') {
+  if (('0' <= *word && *word <= '9') || *word == '-' || *word == '\'') {
     return IMMEDIATE;
   }
 
   return VARIABLE;
+}
+
+int getImmVal(char *word) {
+  if (('0' <= *word && *word <= '9') || *word == '-') {
+    return atoi(word);
+  }
+  if (word[0] == '\'' && word[1] != '\\') {
+    return word[1] - '\0';
+  }
+  switch (word[2]) {
+  case 'a':
+    return '\a';
+  case 'b':
+    return '\b';
+  case 'f':
+    return '\f';
+  case 'n':
+    return '\n';
+  case 'r':
+    return '\r';
+  case 't':
+    return '\t';
+  case 'v':
+    return '\v';
+  case '0':
+    return '\0';
+  }
+  return word[2];
 }
 
 int getTokens(int fd, struct LexToken *tokens) {
@@ -95,7 +122,7 @@ int getTokens(int fd, struct LexToken *tokens) {
 
       strcpy(tokens[n].token.tokstr, word);
       if (type == IMMEDIATE) {
-        tokens[n].token.tokint = atoi(word);
+        tokens[n].token.tokint = getImmVal(word);
       }
       n++;
     }
