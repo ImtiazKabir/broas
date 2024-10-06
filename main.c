@@ -161,6 +161,7 @@ int main(void) {
 			else if (strcmp(lexToken.token.tokstr, "deref") == 0) {
 				instructions[nextInstruction][1] = tokens[i++];
 				instructions[nextInstruction][2] = tokens[i++];
+				instructions[nextInstruction][3] = tokens[i++];
 			}
 			else if (strcmp(lexToken.token.tokstr, "print") == 0) {
 				instructions[nextInstruction][1] = tokens[i++];
@@ -380,8 +381,17 @@ int main(void) {
 
 		else if (strcmp(opcode, "deref") == 0) {
 			long int *addressOperand = (long int *)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int sizeOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 
-			setValue(&instruction[1], (void *)*addressOperand, variables, &nextVariable);
+			long int result;
+
+			int byteCount;
+			for (byteCount = sizeOperand - 1; byteCount >= 0; --byteCount) {
+				char byte = *((char *)addressOperand + byteCount);
+				result = (result << 8) | byte;
+			}
+
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "print") == 0) {
