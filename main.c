@@ -29,7 +29,7 @@ struct Variable {
 void *getValue(struct LexToken valueToken, struct Variable *variables, int numberOfVariables, struct Label *labels, int numberOfLabels);
 void setValue(struct LexToken *pVariableToken, void *value, struct Variable *variables, int *pNumberOfVariables);
 
-int main(void) {
+int main(int argc, char **argv) {
 	int fd;
 
 	struct LexToken instructions[MAX_INSTRUCTIONS][MAX_TOKENS_IN_LINE];
@@ -48,7 +48,17 @@ int main(void) {
 
 	int i;
 
-	fd = open("test.broas", O_RDONLY);
+	if (argc < 2) {
+		fprintf(stderr, "Wrong usage. Sample usage: broas <broas_code_file> <...arguments>\n");
+		exit(1);
+	}
+
+	fd = open(argv[1], O_RDONLY);
+
+	memory[0] = (void *)((long int)argc - 2);
+	for (i = 0; i < argc - 2; ++i) {
+		memory[i + 1] = argv[i + 2];
+	}
 
 	totalTokens = getTokens(fd, tokens);
 
@@ -383,7 +393,7 @@ int main(void) {
 			long int *addressOperand = (long int *)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
 			long int sizeOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 
-			long int result;
+			long int result = 0;
 
 			int byteCount;
 			for (byteCount = sizeOperand - 1; byteCount >= 0; --byteCount) {
