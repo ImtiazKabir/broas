@@ -8,7 +8,7 @@ enum TokenType { LABEL, OPCODE, VARIABLE, IMMEDIATE };
 struct LexToken {
   enum TokenType type;
   union {
-    int tokint;
+    long int tokint;
     char tokstr[MX_TOK_SZ];
   } token;
 };

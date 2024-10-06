@@ -18,16 +18,16 @@
 
 struct Label {
 	char *name;
-	int instructionIndex;
+	long int instructionIndex;
 };
 
 struct Variable {
 	char *name;
-	int value;
+	void *value;
 };
 
-int getValue(struct LexToken valueToken, struct Variable *variables, int numberOfVariables, struct Label *labels, int numberOfLabels);
-void setValue(struct LexToken *pVariableToken, int value, struct Variable *variables, int *pNumberOfVariables);
+void *getValue(struct LexToken valueToken, struct Variable *variables, int numberOfVariables, struct Label *labels, int numberOfLabels);
+void setValue(struct LexToken *pVariableToken, void *value, struct Variable *variables, int *pNumberOfVariables);
 
 int main(void) {
 	int fd;
@@ -44,7 +44,7 @@ int main(void) {
 	struct Variable variables[MAX_VARIABLES];
 	int nextVariable = 0;
 
-	int memory[MEMORY_SIZE];
+	void *memory[MEMORY_SIZE];
 
 	int i;
 
@@ -191,54 +191,54 @@ int main(void) {
 		char *opcode = instruction[0].token.tokstr;
 
 		if (strcmp(opcode, "add") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand + rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand + rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sub") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand - rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand - rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "lw") == 0) {
-			int memoryOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int memoryOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
 
 			setValue(&instruction[1], memory[memoryOperand], variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sw") == 0) {
-			int variableOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
-			int memoryOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			void *variableOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int memoryOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
 
 			memory[memoryOperand] = variableOperand;
 		}
 
 		else if (strcmp(opcode, "mult") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand * rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand * rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "div") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand / rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand / rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "beq") == 0) {
-			int leftOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int branchAddress = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int leftOperand = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int branchAddress = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			
 			if (leftOperand == rightOperand) {
 				nextInstruction = branchAddress;
@@ -247,9 +247,9 @@ int main(void) {
 		}
 
 		else if (strcmp(opcode, "bneq") == 0) {
-			int leftOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int branchAddress = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int leftOperand = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int branchAddress = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			
 			if (leftOperand != rightOperand) {
 				nextInstruction = branchAddress;
@@ -258,64 +258,64 @@ int main(void) {
 		}
 
 		else if (strcmp(opcode, "mod") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand % rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand % rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "xor") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand ^ rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand ^ rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "or") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand | rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand | rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "and") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand & rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand & rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "not") == 0) {
-			int operand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int result = ~operand;
+			long int operand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int result = ~operand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sl") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand << rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand << rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "sr") == 0) {
-			int leftOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
-			int result = leftOperand >> rightOperand;
+			long int leftOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int result = leftOperand >> rightOperand;
 
-			setValue(&instruction[1], result, variables, &nextVariable);
+			setValue(&instruction[1], (void *)result, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "blt") == 0) {
-			int leftOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int branchAddress = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int leftOperand = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int branchAddress = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			
 			if (leftOperand < rightOperand) {
 				nextInstruction = branchAddress;
@@ -324,9 +324,9 @@ int main(void) {
 		}
 
 		else if (strcmp(opcode, "bgt") == 0) {
-			int leftOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int branchAddress = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int leftOperand = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int branchAddress = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			
 			if (leftOperand > rightOperand) {
 				nextInstruction = branchAddress;
@@ -335,9 +335,9 @@ int main(void) {
 		}
 
 		else if (strcmp(opcode, "ble") == 0) {
-			int leftOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int branchAddress = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int leftOperand = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int branchAddress = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
 			
 			if (leftOperand <= rightOperand) {
 				nextInstruction = branchAddress;
@@ -346,9 +346,10 @@ int main(void) {
 		}
 
 		else if (strcmp(opcode, "bge") == 0) {
-			int leftOperand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
-			int rightOperand = getValue(instruction[2], variables, nextVariable, labels, nextLabel);
-			int branchAddress = getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			long int leftOperand = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int rightOperand = (long int)getValue(instruction[2], variables, nextVariable, labels, nextLabel);
+			long int branchAddress = (long int)getValue(instruction[3], variables, nextVariable, labels, nextLabel);
+			
 			
 			if (leftOperand >= rightOperand) {
 				nextInstruction = branchAddress;
@@ -357,26 +358,26 @@ int main(void) {
 		}
 
 		else if (strcmp(opcode, "jmp") == 0) {
-			int jumpAddress = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int jumpAddress = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
 
 			nextInstruction = jumpAddress;
 			continue;
 		}
 
 		else if (strcmp(opcode, "print") == 0) {
-			int operand = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int operand = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
 
-			printf("%c", operand);
+			printf("%c", (char)operand);
 		}
 
 		else if (strcmp(opcode, "scan") == 0) {
-			int c = getchar();
+			long int c = (long int)getchar();
 
-			setValue(&instruction[1], c, variables, &nextVariable);
+			setValue(&instruction[1], (void *)c, variables, &nextVariable);
 		}
 
 		else if (strcmp(opcode, "exit") == 0) {
-			int exitCode = getValue(instruction[1], variables, nextVariable, labels, nextLabel);
+			long int exitCode = (long int)getValue(instruction[1], variables, nextVariable, labels, nextLabel);
 			exit(exitCode);
 		}
 
@@ -391,8 +392,8 @@ int main(void) {
 	return 0;
 }
 
-int getValue(struct LexToken valueToken, struct Variable *variables, int numberOfVariables, struct Label *labels, int numberOfLabels) {
-	if (valueToken.type == IMMEDIATE) return valueToken.token.tokint;
+void *getValue(struct LexToken valueToken, struct Variable *variables, int numberOfVariables, struct Label *labels, int numberOfLabels) {
+	if (valueToken.type == IMMEDIATE) return (void *)valueToken.token.tokint;
 	else if (valueToken.type == VARIABLE) {
 		int i;
 		for (i = 0; i < numberOfVariables; ++i) {
@@ -405,7 +406,7 @@ int getValue(struct LexToken valueToken, struct Variable *variables, int numberO
 		int i;
 		for (i = 0; i < numberOfLabels; ++i) {
 			if (strcmp(labels[i].name, valueToken.token.tokstr) == 0) {
-				return labels[i].instructionIndex;
+				return (void *)labels[i].instructionIndex;
 			}
 		}
 	}
@@ -417,7 +418,7 @@ int getValue(struct LexToken valueToken, struct Variable *variables, int numberO
 	exit(1);
 }
 
-void setValue(struct LexToken *pVariableToken, int value, struct Variable *variables, int *pNumberOfVariables) {
+void setValue(struct LexToken *pVariableToken, void *value, struct Variable *variables, int *pNumberOfVariables) {
 	int i;
 	struct LexToken variableToken = *pVariableToken;
 	
