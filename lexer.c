@@ -52,7 +52,8 @@ enum TokenType toktype(char const *word) {
   static char const opcodes[][8] = {
       "add", "sub", "lw",  "sw",  "mult",  "div",  "beq", "bneq",
       "mod", "xor", "or",  "and", "not",   "sl",   "sr",  "blt",
-      "bgt", "ble", "bge", "jmp", "print", "scan", "exit"};
+      "bgt", "ble", "bge", "jmp", "ref", "deref",
+			"print", "scan", "exit"};
   static int const n = sizeof(opcodes) / sizeof(opcodes[0]);
   int i;
 
